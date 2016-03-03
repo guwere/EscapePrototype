@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using Random = UnityEngine.Random;
 
-public class FloorGrid : MonoBehaviour
+public class FloorGridManager : MonoBehaviour
 {
     [Range(1, 32)]
     public int _rows = 10;
@@ -22,7 +22,6 @@ public class FloorGrid : MonoBehaviour
 
     private GameObject[][] groundTiles;
 
-    private Vector3 _mouseHoleLocalPosition;
     private Vector3 _floorSize;
 
     private int[] _wallOccupanies; // we will use the int as a 32-bit mask
@@ -36,7 +35,6 @@ public class FloorGrid : MonoBehaviour
 
 	void Awake ()
 	{
-        _mouseHoleLocalPosition = new Vector3(0f, 0f, 0.3f);
         _floorSize = GetComponent<Renderer>().bounds.size;
 
 	    int numWalls = Enum.GetNames(typeof(WallSide)).Length;
@@ -77,7 +75,8 @@ public class FloorGrid : MonoBehaviour
                 Vector3 currPosition = new Vector3(row * -tilePositionOffsetX, 0, col * tilePositionOffsetZ);
                 groundTile.transform.localPosition = currPosition + anchorOffset;
                 groundTiles[col][row] = groundTile;
-
+                ArrowPlacer floorTile = groundTile.GetComponent<ArrowPlacer>();
+                floorTile.SetGridPosition(row, col);
             }
         }
     }
