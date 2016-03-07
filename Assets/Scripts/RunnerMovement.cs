@@ -18,6 +18,9 @@ public class RunnerMovement : MonoBehaviour
 
     private Directions2d _direction = Directions2d.eNone;
 
+    private Vector3 _startPosition;
+    private Vector3 _nextPosition;
+
     public Directions2d Direction
     {
         get { return _direction; }
@@ -33,17 +36,27 @@ public class RunnerMovement : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("AdvanceTurn"))
-        {
-            Debug.Log("Advance Turn Pressed");
-            GameObject currTile = GetTileBelow();
-            GridPosition currGridPos = _floorGridPlacer.GetGridPosition(currTile);
-            GridMovement nextMove = GetNextGridMovementDefault(currGridPos._row, currGridPos._col);
-            GameObject nextTile = _floorGridPlacer.GetFloorTile(nextMove._position);
-            Vector3 nextWorldPos = nextTile.transform.position;
-            nextWorldPos.y = transform.position.y;
-            transform.position = Vector3.Lerp(transform.position, nextWorldPos, 2.0f);
-        }
+
+    }
+
+
+    public void CalculateNextPosition()
+    {
+        GameObject currTile = GetTileBelow();
+        GridPosition currGridPos = _floorGridPlacer.GetGridPosition(currTile);
+        GridMovement nextMove = GetNextGridMovementDefault(currGridPos._row, currGridPos._col);
+        GameObject nextTile = _floorGridPlacer.GetFloorTile(nextMove._position);
+        _nextPosition = nextTile.transform.position;
+        _nextPosition.y = transform.position.y;
+        _startPosition = transform.position;
+        //Debug.Log("Start pos : (" + currGridPos._row + "," + currGridPos._col + ")");
+        //Debug.Log("End pos : (" + nextMove._position._row + "," + nextMove._position._col + ")");
+
+    }
+
+    public void Move(float f)
+    {
+        transform.position = Vector3.Lerp(_startPosition, _nextPosition, f);
     }
 
     private GameObject GetTileBelow()
@@ -172,4 +185,6 @@ public class RunnerMovement : MonoBehaviour
         }
         return result;
     }
+
+
 }

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections;
 
 public class TurnAdvancement : MonoBehaviour
@@ -6,7 +7,8 @@ public class TurnAdvancement : MonoBehaviour
     public enum GameState
     {
         eIdle,
-        eMoving
+        eMoving,
+        ePostMoving,
     }
     public GameState State
     {
@@ -19,7 +21,6 @@ public class TurnAdvancement : MonoBehaviour
     }
 
     public float _turnTime = 1f; // in seconds
-    public float _speed = 2f;
 
     private GameState _state = GameState.eIdle;
     private float _elapsedTurnTime = 0f;
@@ -33,6 +34,51 @@ public class TurnAdvancement : MonoBehaviour
 
     void Update()
     {
+        switch (_state)
+        {
+            case GameState.eIdle:
+                {
+                    if (Input.GetButtonDown("AdvanceTurn")) // wait for input
+                    {
+                        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
+                        foreach (var runner in runners)
+                        {
+                            runner.CalculateNextPosition();
+                        }
+                        _state = GameState.eMoving;
+                        _elapsedTurnTime = 0;
+                    }
+
+                }
+                break;
+            case GameState.eMoving:
+                {
+                    if (_elapsedTurnTime < _turnTime)
+                    {
+                        float percentageComplete = _elapsedTurnTime / _turnTime;
+
+                        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
+                        foreach (var runner in runners)
+                        {
+                            runner.Move(percentageComplete);
+                        }
+                        _elapsedTurnTime += Time.deltaTime;
+                    }
+                    else
+                    {
+                        _state = GameState.eIdle;
+                    }
+
+                }
+                break;
+            case GameState.ePostMoving:
+                {
+
+                }
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
         //if (Input.GetButtonDown("AdvanceTurn"))
         //{
         //    if (_state == GameState.eIdle)
@@ -53,7 +99,4 @@ public class TurnAdvancement : MonoBehaviour
 
         //}
     }
-
-
-
 }
