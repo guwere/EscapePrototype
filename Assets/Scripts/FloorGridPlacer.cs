@@ -20,6 +20,9 @@ public class FloorGridPlacer : MonoBehaviour
     
     public GameObject _mouseHole;
     public GameObject [] _baseboards;
+    public float _exitPointAlpha = 100f;
+
+    private ArrayList _exitPoints;
 
     private GameObject[][] _floorTiles;
 
@@ -54,6 +57,8 @@ public class FloorGridPlacer : MonoBehaviour
         {
             _floorTiles[col] = new GameObject[_rows];
         }
+
+        _exitPoints = new ArrayList();
 
         CreateGroundTiles();
 	    CreateMouseHoles();
@@ -96,6 +101,7 @@ public class FloorGridPlacer : MonoBehaviour
         {
             // Chooose a random wall
             int wallNum = Random.Range(0, Enum.GetNames(typeof(WallSide)).Length);
+            WallSide wallSideEnum = (WallSide) wallNum;
             bool horizontal = (WallSide)wallNum == WallSide.eBack;
 
             // Instantiate hole
@@ -109,7 +115,7 @@ public class FloorGridPlacer : MonoBehaviour
             mouseHolePosition -= _tileOrigin.transform.localPosition;
             Vector3 mouseHoleRotation = new Vector3(0f, 0f, 0f);
             Vector3 mouseHoleScale = new Vector3(horizontal ? _groundTileScale.z : _groundTileScale.x, mouseHole.transform.localScale.y, mouseHole.transform.localScale.z);
-            switch ((WallSide)wallNum)
+            switch (wallSideEnum)
             {
                 case WallSide.eLeft:
                     mouseHolePosition.z += -_floorSize.z / 2;
@@ -129,9 +135,10 @@ public class FloorGridPlacer : MonoBehaviour
             // Change where the mouse hole is positioned along the wall
             int wallOccupancy = _wallOccupanies[wallNum];
             bool placed = false;
+            int randomPosition = 0;
             while (!placed)
             {
-                int randomPosition = Random.Range(0, (horizontal ? _columns : _rows));
+                randomPosition = Random.Range(0, (horizontal ? _columns : _rows));
                 Debug.Log("Random position(" + ((WallSide)wallNum).ToString() + "," + randomPosition + ")");
                 if ((wallOccupancy & (1 << randomPosition)) == 0)
                 {
@@ -150,7 +157,46 @@ public class FloorGridPlacer : MonoBehaviour
             }
             mouseHole.transform.localPosition = mouseHolePosition;
 
+            GridPosition gridPosition = GetMouseHoleGridPosition(wallSideEnum, randomPosition);
+            MarkExitPoint(gridPosition);
         }
+
+    }
+
+    private void MarkExitPoint(GridPosition gridPosition)
+    {
+        GameObject tile = _floorTiles[gridPosition._col][gridPosition._row];
+        Color newColor = tile.GetComponent<Renderer>().materials[0].color;
+        newColor.a = _exitPointAlpha / 255f;
+        tile.GetComponent<Renderer>().materials[0].color = newColor;
+
+        if (!_exitPoints.Contains(tile))
+        {
+            _exitPoints.Add(tile);
+        }
+    }
+
+    private GridPosition GetMouseHoleGridPosition(WallSide wallSideEnum, int randomPosition)
+    {
+        GridPosition result = new GridPosition();
+        switch (wallSideEnum)
+        {
+            case WallSide.eLeft:
+                result._row = randomPosition;
+                result._col = 0;
+                break;
+            case WallSide.eRight:
+                result._row = randomPosition;
+                result._col = _columns - 1;
+                break;
+            case WallSide.eBack:
+                result._row = _rows - 1;
+                result._col = randomPosition;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException("wallSideEnum", wallSideEnum, null);
+        }
+        return result;
     }
 
     public GameObject GetFloorTile(GridPosition position)
