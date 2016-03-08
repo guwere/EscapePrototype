@@ -53,6 +53,11 @@ public class FloorGridPlacer : MonoBehaviour
         get { return _tileScaleFactorVector; }
     }
 
+    public Vector3 GroundTileScale
+    {
+        get { return _groundTileScale; }
+    }
+
 
     void Awake ()
 	{

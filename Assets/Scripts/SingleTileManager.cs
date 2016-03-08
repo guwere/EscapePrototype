@@ -91,6 +91,7 @@ public class SingleTileManager : MonoBehaviour
             _currArrow = Instantiate(_arrowPlanePrefab);
             _currArrow.transform.parent = this.transform;
             _currArrow.transform.localPosition = new Vector3(0, .05f, 0);
+            _currArrow.transform.localScale = new Vector3(1f, 1f, 1f);
         }
         _currArrow.transform.localEulerAngles = localRotation;
     }
