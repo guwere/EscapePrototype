@@ -11,17 +11,28 @@ public enum Directions2d
     eRight
 };
 
-public class ArrowPlacer : MonoBehaviour
+public class SingleTileManager : MonoBehaviour
 {
 
     public GameObject _arrowPlanePrefab;
     public float _removeArrowThreshold = 5.0f; // the distance between the start and end touch locations
 
+    private GridPosition _gridPosition;
     private Vector3 _startPosition;
-    private Directions2d _direction;
-    private int _row;
-    private int _col;
+
+    private Directions2d _arrowDirection;  
     private GameObject _currArrow;
+
+    public GridPosition GridPosition
+    {
+        get { return _gridPosition; }
+        set { _gridPosition = value; }
+    }
+
+    public Directions2d ArrowDirection
+    {
+        get { return _arrowDirection; }
+    }
 
     // Use this for initialization
     void Start()
@@ -32,29 +43,31 @@ public class ArrowPlacer : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            _startPosition = Input.mousePosition;
-            _direction = Directions2d.eNone;
 
-        }
-        else if (Input.GetButtonUp("Fire1"))
-        {
-        }
+    }
 
+    private void OnMouseDown()
+    {
+        _startPosition = Input.mousePosition;
+        _arrowDirection = Directions2d.eNone;
+    }
+
+    private void OnMouseUp()
+    {
+        Vector3 endPosition = Input.mousePosition;
+        _arrowDirection = GetDirection2d(_startPosition, endPosition);
+        SpawnArrow();
     }
 
     void SpawnArrow()
     {
-        if (!_currArrow)
+        if (_currArrow)
         {
-            _currArrow = Instantiate(_arrowPlanePrefab);
-            _currArrow.transform.parent = this.transform;
-            _currArrow.transform.localPosition = new Vector3(0, .05f, 0);
+            Destroy(_currArrow);
         }
 
         Vector3 localRotation = new Vector3(90.0f, 0, 0);
-        switch (_direction)
+        switch (_arrowDirection)
         {
             case Directions2d.eUp:
                 localRotation.z = 0.0f;
@@ -69,31 +82,17 @@ public class ArrowPlacer : MonoBehaviour
                 localRotation.z = 270.0f;
                 break;
             case Directions2d.eNone:
-                {
-                    if (_currArrow)
-                    {
-                        Destroy(_currArrow);
-                    }
-               }
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+        if (!_currArrow && _arrowDirection != Directions2d.eNone)
+        {
+            _currArrow = Instantiate(_arrowPlanePrefab);
+            _currArrow.transform.parent = this.transform;
+            _currArrow.transform.localPosition = new Vector3(0, .05f, 0);
+        }
         _currArrow.transform.localEulerAngles = localRotation;
-    }
-
-    private void OnMouseUp()
-    {
-        Debug.Log("Tile: (" + _row + "," + _col + ") was pressed");
-        Vector3 endPosition = Input.mousePosition;
-        _direction = GetDirection2d(_startPosition, endPosition);
-        SpawnArrow();
-    }
-
-    public void SetGridPosition(int row, int col)
-    {
-        _row = row;
-        _col = col;
     }
 
     private Directions2d GetDirection2d(Vector3 startPosition, Vector3 endPosition)

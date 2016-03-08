@@ -187,4 +187,13 @@ public class RunnerMovement : MonoBehaviour
     }
 
 
+    public void RespondToArrow()
+    {
+        SingleTileManager tile = GetTileBelow().GetComponent<SingleTileManager>();
+        Directions2d newDirection = tile.ArrowDirection;
+        if (newDirection != Directions2d.eNone)
+        {
+            _direction = newDirection;
+        }
+    }
 }

@@ -7,8 +7,8 @@ public class TurnAdvancement : MonoBehaviour
     public enum GameState
     {
         eIdle,
+        eCalculatePositions,
         eMoving,
-        ePostMoving,
     }
     public GameState State
     {
@@ -40,15 +40,23 @@ public class TurnAdvancement : MonoBehaviour
                 {
                     if (Input.GetButtonDown("AdvanceTurn")) // wait for input
                     {
-                        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
-                        foreach (var runner in runners)
-                        {
-                            runner.CalculateNextPosition();
-                        }
-                        _state = GameState.eMoving;
+                        _state = GameState.eCalculatePositions;
                         _elapsedTurnTime = 0;
                     }
 
+                }
+                break;
+            case GameState.eCalculatePositions:
+                {
+                    RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
+                    foreach (var runner in runners)
+                    {
+                        Debug.Log("Direction before: " + runner.Direction);
+                        runner.RespondToArrow();
+                        Debug.Log("Direction after: " + runner.Direction);
+                        runner.CalculateNextPosition();
+                    }
+                    _state = GameState.eMoving;
                 }
                 break;
             case GameState.eMoving:
@@ -71,32 +79,10 @@ public class TurnAdvancement : MonoBehaviour
 
                 }
                 break;
-            case GameState.ePostMoving:
-                {
 
-                }
-                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
-        //if (Input.GetButtonDown("AdvanceTurn"))
-        //{
-        //    if (_state == GameState.eIdle)
-        //    {
-        //        _elapsedTurnTime = 0f;
-        //        _state = GameState.eMoving;
-        //    }
-        //    else if (_state == GameState.eMoving)
-        //    {
-        //        _elapsedTurnTime += Time.deltaTime;
 
-        //        if (_elapsedTurnTime >= _turnTime)
-        //        {
-        //            _state = GameState.eIdle;
-        //        }
-
-        //    }
-
-        //}
     }
 }

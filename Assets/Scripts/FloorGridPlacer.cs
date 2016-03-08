@@ -94,8 +94,8 @@ public class FloorGridPlacer : MonoBehaviour
                 Vector3 currPosition = new Vector3(row * -_tileScaleFactorVector.z, 0, col * _tileScaleFactorVector.x);
                 groundTile.transform.localPosition = currPosition + anchorOffset;
                 _floorTiles[col][row] = groundTile;
-                ArrowPlacer floorTile = groundTile.GetComponent<ArrowPlacer>();
-                floorTile.SetGridPosition(row, col);
+                SingleTileManager floorTile = groundTile.GetComponent<SingleTileManager>();
+                floorTile.GridPosition = new GridPosition(col, row);
             }
         }
     }
