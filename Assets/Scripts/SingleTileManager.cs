@@ -2,15 +2,6 @@
 using UnityEngine;
 using System.Collections;
 
-public enum Directions2d
-{
-    eNone,
-    eUp,
-    eDown,
-    eLeft,
-    eRight
-};
-
 public class SingleTileManager : MonoBehaviour
 {
 
@@ -92,8 +83,9 @@ public class SingleTileManager : MonoBehaviour
             _currArrow.transform.parent = this.transform;
             _currArrow.transform.localPosition = new Vector3(0, .05f, 0);
             _currArrow.transform.localScale = new Vector3(1f, 1f, 1f);
+            _currArrow.transform.localEulerAngles = localRotation;
         }
-        _currArrow.transform.localEulerAngles = localRotation;
+
     }
 
     private Directions2d GetDirection2d(Vector3 startPosition, Vector3 endPosition)

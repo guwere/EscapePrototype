@@ -3,13 +3,6 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public struct GridMovement
-{
-    public GridPosition _position;
-    public Directions2d _direction;
-}
-
-
 public class RunnerMovement : MonoBehaviour
 {
     private GameObject _gameController;

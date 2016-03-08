@@ -3,17 +3,6 @@ using UnityEngine;
 using System.Collections;
 using Random = UnityEngine.Random;
 
-public struct GridPosition
-{
-    public int _row;
-    public int _col;
-
-    public GridPosition(int col, int row) : this()
-    {
-        _row = row;
-        _col = col;
-    }
-}
 
 public class FloorGridPlacer : MonoBehaviour
 {
@@ -40,13 +29,6 @@ public class FloorGridPlacer : MonoBehaviour
 
     private Vector3 _tileScaleFactorVector;
     private Vector3 _groundTileScale;
-
-    private enum WallSide
-    {
-        eLeft,
-        eRight,
-        eBack
-    }
 
     public Vector3 TileScaleFactorVector
     {
