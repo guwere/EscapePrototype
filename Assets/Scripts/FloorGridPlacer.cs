@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
 
@@ -10,25 +11,23 @@ public class FloorGridPlacer : MonoBehaviour
     public int _rows = 10;
     [Range(1, 32)]
     public int _columns = 8;
-    [Range (0.0f, 1.0f)]
+    [Range(0.0f, 1.0f)]
     public float _tileSpacing = 0.1f; // percent fo the size of the tile
 
     public int _numHoles = 5;
 
     public GameObject _groundTile;
     public GameObject _tileOrigin;
-    
-    public GameObject _mouseHole;
-    public GameObject [] _baseboards;
-    public float _exitPointAlpha = 100f;
 
-    private ArrayList _exitPoints;
+    public GameObject _mouseHole;
+    public GameObject[] _baseboards;
+    public float _exitPointAlpha = 100f;
 
     private GameObject[][] _floorTiles;
 
     private Vector3 _floorSize;
 
-    private int[] _wallOccupanies; // we will use the int as a 32-bit mask
+    private ArrayList[] _exitPoints; // Three walls. Each wall is a set of integer positions along the wall
 
     private Vector3 _tileScaleFactorVector;
     private Vector3 _groundTileScale;
@@ -43,26 +42,33 @@ public class FloorGridPlacer : MonoBehaviour
         get { return _groundTileScale; }
     }
 
+    public ArrayList[] ExitPoints
+    {
+        get { return _exitPoints; }
+    }
 
-    void Awake ()
-	{
+
+    void Awake()
+    {
         _floorSize = GetComponent<Renderer>().bounds.size;
-        _tileScaleFactorVector = new Vector3((_floorSize.z/_columns), 1f, (_floorSize.x / _rows));
+        _tileScaleFactorVector = new Vector3((_floorSize.z / _columns), 1f, (_floorSize.x / _rows));
 
         int numWalls = Enum.GetNames(typeof(WallSide)).Length;
-        _wallOccupanies = new int[numWalls];
+        _exitPoints = new ArrayList[numWalls];
+        for (int wall = 0; wall < numWalls; wall++)
+        {
+            _exitPoints[wall] = new ArrayList();
+        }
 
-	    _floorTiles = new GameObject[_columns][];
+        _floorTiles = new GameObject[_columns][];
         for (int col = 0; col < _columns; col++)
         {
             _floorTiles[col] = new GameObject[_rows];
         }
 
-        _exitPoints = new ArrayList();
-
         CreateGroundTiles();
-	    CreateMouseHoles();
-	}
+        CreateMouseHoles();
+    }
 
     void CreateGroundTiles()
     {
@@ -99,10 +105,25 @@ public class FloorGridPlacer : MonoBehaviour
 
         for (int i = 0; i < _numHoles; i++)
         {
-            // Chooose a random wall
-            int wallNum = Random.Range(0, Enum.GetNames(typeof(WallSide)).Length);
-            WallSide wallSideEnum = (WallSide) wallNum;
-            bool horizontal = (WallSide)wallNum == WallSide.eBack;
+            bool positionChosen = false;
+            int randomPosition = 0;
+            bool horizontal = false;
+            int randomWall = Random.Range(0, Enum.GetNames(typeof(WallSide)).Length);
+            while (!positionChosen)
+            {
+                // Change where the mouse hole is positioned along the wall
+                ArrayList wallOccupancy = _exitPoints[randomWall];
+                horizontal = (WallSide)randomWall == WallSide.eBack;
+                randomPosition = Random.Range(0, (horizontal ? _columns : _rows));
+                Debug.Log("Random position(" + ((WallSide)randomWall).ToString() + "," + randomPosition + ")");
+                if (!(wallOccupancy.Contains(randomPosition)))
+                {
+                    wallOccupancy.Add(randomPosition);
+                    positionChosen = true;
+
+                }
+            }
+            WallSide wallSideEnum = (WallSide)randomWall;
 
             // Instantiate hole
             GameObject mouseHole = Instantiate(_mouseHole);
@@ -132,29 +153,16 @@ public class FloorGridPlacer : MonoBehaviour
             mouseHole.transform.Rotate(mouseHoleRotation);
             mouseHole.transform.localScale = mouseHoleScale;
 
-            // Change where the mouse hole is positioned along the wall
-            int wallOccupancy = _wallOccupanies[wallNum];
-            bool placed = false;
-            int randomPosition = 0;
-            while (!placed)
+            if (horizontal)
             {
-                randomPosition = Random.Range(0, (horizontal ? _columns : _rows));
-                Debug.Log("Random position(" + ((WallSide)wallNum).ToString() + "," + randomPosition + ")");
-                if ((wallOccupancy & (1 << randomPosition)) == 0)
-                {
-                    _wallOccupanies[wallNum] = wallOccupancy | (1 << randomPosition);
-                    placed = true;
-                    if (horizontal)
-                    {
-                        mouseHolePosition.z = _floorTiles[randomPosition][0].transform.localPosition.z;
-                    }
-                    else
-                    {
-                        mouseHolePosition.x = _floorTiles[0][randomPosition].transform.localPosition.x;
-                    }
-
-                }
+                mouseHolePosition.z = _floorTiles[randomPosition][0].transform.localPosition.z;
             }
+            else
+            {
+                mouseHolePosition.x = _floorTiles[0][randomPosition].transform.localPosition.x;
+            }
+
+
             mouseHole.transform.localPosition = mouseHolePosition;
 
             GridPosition gridPosition = GetMouseHoleGridPosition(wallSideEnum, randomPosition);
@@ -170,35 +178,52 @@ public class FloorGridPlacer : MonoBehaviour
         newColor.a = _exitPointAlpha / 255f;
         tile.GetComponent<Renderer>().materials[0].color = newColor;
 
-        if (!_exitPoints.Contains(tile))
+        //if (!_exitPoints.Contains(tile))
         {
-            _exitPoints.Add(tile);
+            //_exitPoints.Add(tile);
             tile.GetComponent<SingleTileManager>().IsExitPoint = true;
         }
     }
 
-    private GridPosition GetMouseHoleGridPosition(WallSide wallSideEnum, int randomPosition)
+    public GridPosition GetMouseHoleGridPosition(WallSide wallSideEnum, int position)
     {
         GridPosition result = new GridPosition();
         switch (wallSideEnum)
         {
             case WallSide.eLeft:
-                result._row = randomPosition;
+                result._row = position;
                 result._col = 0;
                 break;
             case WallSide.eRight:
-                result._row = randomPosition;
+                result._row = position;
                 result._col = _columns - 1;
                 break;
             case WallSide.eBack:
                 result._row = _rows - 1;
-                result._col = randomPosition;
+                result._col = position;
                 break;
             default:
                 throw new ArgumentOutOfRangeException("wallSideEnum", wallSideEnum, null);
         }
         return result;
     }
+
+
+    public Directions2d GetExitPointDirection(WallSide wallSideEnum)
+    {
+        switch (wallSideEnum)
+        {
+            case WallSide.eLeft:
+                return Directions2d.eRight;
+            case WallSide.eRight:
+                return Directions2d.eLeft;
+            case WallSide.eBack:
+                return Directions2d.eDown;
+        }
+        throw new ArgumentOutOfRangeException("wallSideEnum", wallSideEnum, null);
+
+    }
+
 
     public GameObject GetFloorTile(GridPosition position)
     {

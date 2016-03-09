@@ -104,6 +104,7 @@ public class RunnerMovement : MonoBehaviour
         else
         {
             Debug.LogError("Runner is not on top of any tile");
+            Debug.Log(UnityEngine.StackTraceUtility.ExtractStackTrace());
         }
         return null;
     }

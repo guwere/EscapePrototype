@@ -22,12 +22,18 @@ public class TurnAdvancement : MonoBehaviour
         get { return _elapsedTurnTime; }
     }
 
-    public float _turnTime = 1f; // in seconds
+    public int TurnsElapsed
+    {
+        get { return _turnsElapsed; }
+    }
+
+    public float _turnDuration = 1f; // in seconds
 
     private GameState _state = GameState.eIdle;
     private float _elapsedTurnTime = 0f;
+    private int _turnsElapsed = 0;
 
-    // Use this for initialization
+
     void Start()
     {
 
@@ -45,6 +51,7 @@ public class TurnAdvancement : MonoBehaviour
                     {
                         _state = GameState.eCalculatePositions;
                         _elapsedTurnTime = 0;
+                        _turnsElapsed++;
                     }
 
                 }
@@ -63,9 +70,9 @@ public class TurnAdvancement : MonoBehaviour
                 break;
             case GameState.eMoving:
                 {
-                    if (_elapsedTurnTime < _turnTime)
+                    if (_elapsedTurnTime < _turnDuration)
                     {
-                        float percentageComplete = _elapsedTurnTime / _turnTime;
+                        float percentageComplete = _elapsedTurnTime / _turnDuration;
 
                          foreach (var runner in runners)
                         {
