@@ -64,6 +64,7 @@ public class RunnerMovement : MonoBehaviour
                 }
                 break;
             case State.eDestroy:
+                GameObject.Find("ScoreText").GetComponent<ScoreText>().ChaseeAquired();
                 Destroy(this.gameObject);
                 break;
             default:
@@ -81,8 +82,6 @@ public class RunnerMovement : MonoBehaviour
         _nextPosition = nextTile.transform.position;
         _nextPosition.y = transform.position.y;
         _startPosition = transform.position;
-        //Debug.Log("Start pos : (" + currGridPos._row + "," + currGridPos._col + ")");
-        //Debug.Log("End pos : (" + nextMove._position._row + "," + nextMove._position._col + ")");
     }
 
     public void Move(float f)
@@ -100,7 +99,6 @@ public class RunnerMovement : MonoBehaviour
         mask |= (1 << LayerMask.NameToLayer("FloorTiles"));
         if (Physics.Raycast(transform.position, -Vector3.up, out hit, mask))
         {
-            //Debug.Log("The name of the object: " + hit.transform.gameObject.tag);
             return hit.transform.gameObject;
         }
         else

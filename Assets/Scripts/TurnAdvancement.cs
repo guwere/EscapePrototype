@@ -9,7 +9,8 @@ public class TurnAdvancement : MonoBehaviour
         eIdle,
         eCalculatePositions,
         eMoving,
-        eCheckExitPoints
+        eCheckExitPoints,
+        eChechEndGame
     }
     public GameState State
     {
