@@ -9,6 +9,7 @@ public class TurnAdvancement : MonoBehaviour
         eIdle,
         eCalculatePositions,
         eMoving,
+        eCheckExitPoints
     }
     public GameState State
     {
@@ -34,6 +35,7 @@ public class TurnAdvancement : MonoBehaviour
 
     void Update()
     {
+        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
         switch (_state)
         {
             case GameState.eIdle:
@@ -48,8 +50,7 @@ public class TurnAdvancement : MonoBehaviour
                 break;
             case GameState.eCalculatePositions:
                 {
-                    RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
-                    foreach (var runner in runners)
+                     foreach (var runner in runners)
                     {
                         Debug.Log("Direction before: " + runner.Direction);
                         runner.RespondToArrow();
@@ -65,8 +66,7 @@ public class TurnAdvancement : MonoBehaviour
                     {
                         float percentageComplete = _elapsedTurnTime / _turnTime;
 
-                        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
-                        foreach (var runner in runners)
+                         foreach (var runner in runners)
                         {
                             runner.Move(percentageComplete);
                         }
@@ -74,12 +74,20 @@ public class TurnAdvancement : MonoBehaviour
                     }
                     else
                     {
-                        _state = GameState.eIdle;
+                        _state = GameState.eCheckExitPoints;
                     }
 
                 }
                 break;
-
+            case GameState.eCheckExitPoints:
+                {
+                    foreach (var runner in runners)
+                    {
+                        runner.CheckExitPoint();
+                    }
+                    _state = GameState.eIdle;
+                }
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }

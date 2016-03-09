@@ -5,10 +5,23 @@ using System.Collections.Generic;
 
 public class RunnerMovement : MonoBehaviour
 {
-    private GameObject _gameController;
-    private TurnAdvancement _turn;
+    public float _vanishDuration = 1f;
+    private float _elapsedVanishDuration = 0f;
+    private Color _originalColor;
+    private Color _vanishColor = new Color(0, 0, 0, 0);
+    public static Color32 _successColor = new Color(128, 255, 128, 0);
+    public static Color32 _failColor = new Color(0, 0, 0, 0);
+
+    public enum State
+    {
+        eMoving,
+        eVanishing,
+        eDestroy
+    }
+
     private FloorGridPlacer _floorGridPlacer;
 
+    private State _runnerState = State.eMoving;
     private Directions2d _direction = Directions2d.eNone;
 
     private Vector3 _startPosition;
@@ -20,16 +33,42 @@ public class RunnerMovement : MonoBehaviour
         set { _direction = value; }
     }
 
+    public State RunnerState
+    {
+        get { return _runnerState; }
+    }
+
     void Start()
     {
-        _gameController = GameObject.FindGameObjectWithTag("GameController");
-        _turn = _gameController.GetComponent<TurnAdvancement>();
+        _originalColor = GetComponent<Renderer>().material.color;
         _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridPlacer>();
     }
 
     void Update()
     {
+        switch (_runnerState)
+        {
+            case State.eMoving:
+                break;
+            case State.eVanishing:
+                if (_elapsedVanishDuration < _vanishDuration)
+                {
+                    float percentageComplete = _elapsedVanishDuration / _vanishDuration;
+                    GetComponent<Renderer>().material.color = Color.Lerp(_originalColor, _vanishColor, percentageComplete);
 
+                    _elapsedVanishDuration += Time.deltaTime;
+                }
+                else
+                {
+                    _runnerState = State.eDestroy;
+                }
+                break;
+            case State.eDestroy:
+                Destroy(this.gameObject);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException();
+        }
     }
 
 
@@ -44,12 +83,14 @@ public class RunnerMovement : MonoBehaviour
         _startPosition = transform.position;
         //Debug.Log("Start pos : (" + currGridPos._row + "," + currGridPos._col + ")");
         //Debug.Log("End pos : (" + nextMove._position._row + "," + nextMove._position._col + ")");
-
     }
 
     public void Move(float f)
     {
-        transform.position = Vector3.Lerp(_startPosition, _nextPosition, f);
+        if (RunnerState == State.eMoving)
+        {
+            transform.position = Vector3.Lerp(_startPosition, _nextPosition, f);
+        }
     }
 
     private GameObject GetTileBelow()
@@ -59,7 +100,7 @@ public class RunnerMovement : MonoBehaviour
         mask |= (1 << LayerMask.NameToLayer("FloorTiles"));
         if (Physics.Raycast(transform.position, -Vector3.up, out hit, mask))
         {
-            Debug.Log("The name of the object: " + hit.transform.gameObject.tag);
+            //Debug.Log("The name of the object: " + hit.transform.gameObject.tag);
             return hit.transform.gameObject;
         }
         else
@@ -69,14 +110,13 @@ public class RunnerMovement : MonoBehaviour
         return null;
     }
 
-    GridMovement GetNextGridMovementDefault(int iRow, int iCol)
+    private GridMovement GetNextGridMovementDefault(int iRow, int iCol)
     {
         GridMovement result = new GridMovement
         {
             _position =
             {
-                _row = iRow,
-                _col = iCol
+                _row = iRow, _col = iCol
             },
             _direction = _direction
         };
@@ -86,92 +126,89 @@ public class RunnerMovement : MonoBehaviour
             case Directions2d.eNone:
                 break;
             case Directions2d.eUp:
+            {
+                if (result._position._row < _floorGridPlacer._rows - 1)
                 {
-                    if (result._position._row < _floorGridPlacer._rows - 1)
-                    {
-                        result._position._row++;
-                    }
-                    else
-                    {
-                        if (result._position._col < _floorGridPlacer._columns - 1)
-                        {
-                            result._position._col++;
-                            _direction = Directions2d.eRight;
-                        }
-                        else
-                        {
-                            result._position._row--;
-                            _direction = Directions2d.eDown;
-                        }
-
-                    }
+                    result._position._row++;
                 }
-                break;
-            case Directions2d.eDown:
-                {
-                    if (result._position._row > 0)
-                    {
-                        result._position._row--;
-                    }
-                    else
-                    {
-                        if (result._position._col > 0)
-                        {
-                            result._position._col--;
-                            _direction = Directions2d.eLeft;
-                        }
-                        else
-                        {
-                            result._position._row++;
-                            _direction = Directions2d.eUp;
-                        }
-
-                    }
-                }
-
-                break;
-            case Directions2d.eLeft:
-                {
-                    if (result._position._col > 0)
-                    {
-                        result._position._col--;
-                    }
-                    else
-                    {
-                        if (result._position._row < _floorGridPlacer._rows - 1)
-                        {
-                            result._position._row++;
-                            _direction = Directions2d.eUp;
-                        }
-                        else
-                        {
-                            result._position._col++;
-                            _direction = Directions2d.eRight;
-                        }
-                    }
-                }
-                break;
-            case Directions2d.eRight:
+                else
                 {
                     if (result._position._col < _floorGridPlacer._columns - 1)
                     {
                         result._position._col++;
+                        _direction = Directions2d.eRight;
                     }
                     else
                     {
-                        if (result._position._row > 0)
-                        {
-                            result._position._row--;
-                            _direction = Directions2d.eDown;
-                        }
-                        else
-                        {
-                            result._position._col--;
-                            _direction = Directions2d.eLeft;
-                        }
+                        result._position._row--;
+                        _direction = Directions2d.eDown;
                     }
-
                 }
+            }
+                break;
+            case Directions2d.eDown:
+            {
+                if (result._position._row > 0)
+                {
+                    result._position._row--;
+                }
+                else
+                {
+                    if (result._position._col > 0)
+                    {
+                        result._position._col--;
+                        _direction = Directions2d.eLeft;
+                    }
+                    else
+                    {
+                        result._position._row++;
+                        _direction = Directions2d.eUp;
+                    }
+                }
+            }
+
+                break;
+            case Directions2d.eLeft:
+            {
+                if (result._position._col > 0)
+                {
+                    result._position._col--;
+                }
+                else
+                {
+                    if (result._position._row < _floorGridPlacer._rows - 1)
+                    {
+                        result._position._row++;
+                        _direction = Directions2d.eUp;
+                    }
+                    else
+                    {
+                        result._position._col++;
+                        _direction = Directions2d.eRight;
+                    }
+                }
+            }
+                break;
+            case Directions2d.eRight:
+            {
+                if (result._position._col < _floorGridPlacer._columns - 1)
+                {
+                    result._position._col++;
+                }
+                else
+                {
+                    if (result._position._row > 0)
+                    {
+                        result._position._row--;
+                        _direction = Directions2d.eDown;
+                    }
+                    else
+                    {
+                        result._position._col--;
+                        _direction = Directions2d.eLeft;
+                    }
+                }
+            }
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -187,6 +224,16 @@ public class RunnerMovement : MonoBehaviour
         if (newDirection != Directions2d.eNone)
         {
             _direction = newDirection;
+        }
+    }
+
+    public void CheckExitPoint()
+    {
+        bool isOnExitPoint = GetTileBelow().GetComponent<SingleTileManager>().IsExitPoint;
+        if (isOnExitPoint && RunnerState == State.eMoving)
+        {
+            _vanishColor = _successColor;
+            _runnerState = State.eVanishing;
         }
     }
 }

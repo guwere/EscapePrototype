@@ -9,6 +9,7 @@ public class SingleTileManager : MonoBehaviour
     public float _removeArrowThreshold = 5.0f; // the distance between the start and end touch locations
 
     private GridPosition _gridPosition;
+    private bool _isExitPoint = false;
     private Vector3 _startPosition;
 
     private Directions2d _arrowDirection;  
@@ -23,6 +24,12 @@ public class SingleTileManager : MonoBehaviour
     public Directions2d ArrowDirection
     {
         get { return _arrowDirection; }
+    }
+
+    public bool IsExitPoint
+    {
+        get { return _isExitPoint; }
+        set { _isExitPoint = value; }
     }
 
     // Use this for initialization

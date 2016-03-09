@@ -173,6 +173,7 @@ public class FloorGridPlacer : MonoBehaviour
         if (!_exitPoints.Contains(tile))
         {
             _exitPoints.Add(tile);
+            tile.GetComponent<SingleTileManager>().IsExitPoint = true;
         }
     }
 
