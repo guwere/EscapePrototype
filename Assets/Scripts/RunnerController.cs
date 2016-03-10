@@ -9,8 +9,9 @@ public class RunnerController : MonoBehaviour
     private float _elapsedVanishDuration = 0f;
     private Color _originalColor;
     private Color _vanishColor = new Color(0, 0, 0, 0);
-    public static Color32 _successColor = new Color(128, 255, 128, 0);
-    public static Color32 _failColor = new Color(0, 0, 0, 0);
+    public Color32 _successColor = new Color(128, 255, 128, 0);
+    public Color32 _failColor = new Color(0, 0, 0, 0);
+    public int _exitScore = 10;
 
     public enum State
     {
@@ -64,14 +65,18 @@ public class RunnerController : MonoBehaviour
                 }
                 break;
             case State.eDestroy:
-                GameObject.Find("ScoreText").GetComponent<ScoreText>().ChaseeAquired();
-                Destroy(this.gameObject);
+                reachedExitPoint();
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
     }
 
+    protected virtual void reachedExitPoint()
+    {
+        GameObject.Find("ScoreText").GetComponent<ScoreText>().AddScore(_exitScore);
+        Destroy(this.gameObject);
+    }
 
     public void CalculateNextPosition()
     {

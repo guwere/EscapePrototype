@@ -3,6 +3,7 @@ using System.Collections;
 
 public class ChaseeController : RunnerController
 {
+    
 
     // Use this for initialization
     protected override void Start()
@@ -15,4 +16,5 @@ public class ChaseeController : RunnerController
     {
         base.Update();
     }
+
 }
