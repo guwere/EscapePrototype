@@ -38,13 +38,13 @@ public class RunnerController : MonoBehaviour
         get { return _runnerState; }
     }
 
-    void Start()
+    protected virtual void Start()
     {
         _originalColor = GetComponent<Renderer>().material.color;
         _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
     }
 
-    void Update()
+    protected virtual void Update()
     {
         switch (_runnerState)
         {
