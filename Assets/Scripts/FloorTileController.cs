@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections;
 
-public class SingleTileManager : MonoBehaviour
+public class FloorTileController : MonoBehaviour
 {
 
     public GameObject _arrowPlanePrefab;

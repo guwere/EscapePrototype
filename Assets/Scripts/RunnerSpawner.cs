@@ -6,7 +6,7 @@ using Random = UnityEngine.Random;
 
 public class RunnerSpawner : MonoBehaviour
 {
-    private FloorGridPlacer _floor;
+    private FloorGridController _floor;
     private TurnAdvancement _turn;
     public GameObject _runnerPrefab;
 
@@ -20,7 +20,7 @@ public class RunnerSpawner : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        _floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridPlacer>();
+        _floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
         _turn = GetComponent<TurnAdvancement>();
 
         //spawnRunnerTest();
@@ -51,7 +51,7 @@ public class RunnerSpawner : MonoBehaviour
         runner.transform.localScale = new Vector3(runner.transform.localScale.x * floorTile.transform.localScale.x,
             runner.transform.localScale.y,
             runner.transform.localScale.z * floorTile.transform.localScale.z);
-        runner.GetComponent<RunnerMovement>().Direction = randomMovement._direction;
+        runner.GetComponent<RunnerController>().Direction = randomMovement._direction;
     }
 
     public GridMovement GetRandomGridMovement()
@@ -84,6 +84,6 @@ public class RunnerSpawner : MonoBehaviour
         runner.transform.localScale = new Vector3(runner.transform.localScale.x * floorTile.transform.localScale.x,
             runner.transform.localScale.y,
             runner.transform.localScale.z * floorTile.transform.localScale.z);
-        runner.GetComponent<RunnerMovement>().Direction = Directions2d.eRight;
+        runner.GetComponent<RunnerController>().Direction = Directions2d.eRight;
     }
 }

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using Random = UnityEngine.Random;
 
 
-public class FloorGridPlacer : MonoBehaviour
+public class FloorGridController : MonoBehaviour
 {
     [Range(1, 32)]
     public int _rows = 10;
@@ -92,7 +92,7 @@ public class FloorGridPlacer : MonoBehaviour
                 Vector3 currPosition = new Vector3(row * -_tileScaleFactorVector.z, 0, col * _tileScaleFactorVector.x);
                 groundTile.transform.localPosition = currPosition + anchorOffset;
                 _floorTiles[col][row] = groundTile;
-                SingleTileManager floorTile = groundTile.GetComponent<SingleTileManager>();
+                FloorTileController floorTile = groundTile.GetComponent<FloorTileController>();
                 floorTile.GridPosition = new GridPosition(col, row);
             }
         }
@@ -181,7 +181,7 @@ public class FloorGridPlacer : MonoBehaviour
         //if (!_exitPoints.Contains(tile))
         {
             //_exitPoints.Add(tile);
-            tile.GetComponent<SingleTileManager>().IsExitPoint = true;
+            tile.GetComponent<FloorTileController>().IsExitPoint = true;
         }
     }
 

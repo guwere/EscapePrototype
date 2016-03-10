@@ -42,7 +42,7 @@ public class TurnAdvancement : MonoBehaviour
 
     void Update()
     {
-        RunnerMovement[] runners = GameObject.FindObjectsOfType<RunnerMovement>();
+        RunnerController[] runners = GameObject.FindObjectsOfType<RunnerController>();
         switch (_state)
         {
             case GameState.eIdle:

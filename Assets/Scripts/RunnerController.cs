@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class RunnerMovement : MonoBehaviour
+public class RunnerController : MonoBehaviour
 {
     public float _vanishDuration = 1f;
     private float _elapsedVanishDuration = 0f;
@@ -19,7 +19,7 @@ public class RunnerMovement : MonoBehaviour
         eDestroy
     }
 
-    private FloorGridPlacer _floorGridPlacer;
+    private FloorGridController _floorGridPlacer;
 
     private State _runnerState = State.eMoving;
     private Directions2d _direction = Directions2d.eNone;
@@ -41,7 +41,7 @@ public class RunnerMovement : MonoBehaviour
     void Start()
     {
         _originalColor = GetComponent<Renderer>().material.color;
-        _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridPlacer>();
+        _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
     }
 
     void Update()
@@ -218,7 +218,7 @@ public class RunnerMovement : MonoBehaviour
 
     public void RespondToArrow()
     {
-        SingleTileManager tile = GetTileBelow().GetComponent<SingleTileManager>();
+        FloorTileController tile = GetTileBelow().GetComponent<FloorTileController>();
         Directions2d newDirection = tile.ArrowDirection;
         if (newDirection != Directions2d.eNone)
         {
@@ -228,7 +228,7 @@ public class RunnerMovement : MonoBehaviour
 
     public void CheckExitPoint()
     {
-        bool isOnExitPoint = GetTileBelow().GetComponent<SingleTileManager>().IsExitPoint;
+        bool isOnExitPoint = GetTileBelow().GetComponent<FloorTileController>().IsExitPoint;
         if (isOnExitPoint && RunnerState == State.eMoving)
         {
             _vanishColor = _successColor;
