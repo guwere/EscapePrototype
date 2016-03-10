@@ -15,16 +15,24 @@ public class RunnerSpawner : MonoBehaviour
     public int _chaseeToSpawnMin = 1; // the minimum amount of chasee that will be spanwed
     public int _chaseeToSpawnMax = 2; // the maximum amount of chasee that will be spanwed
     public int _totalChasees = 50; // total number of chasees that can spawn
+    private int _chaseeInPlay;
 
     public int _chaserToSpawnMin = 1;
     public int _chaserToSpawnMax = 2;
-    public int _totalChasers = 50;
+    public int _totalChasers = 10;
+
 
     private bool _allowChaserSpawn = false;
 
 
 
     private int _lastTurn = -1;
+
+    public int ChaseeInPlay
+    {
+        get { return _chaseeInPlay; }
+        set { _chaseeInPlay = value; }
+    }
 
     // Use this for initialization
     void Start()
@@ -40,23 +48,28 @@ public class RunnerSpawner : MonoBehaviour
         int currTurn = _turn.TurnsElapsed;
         if (_lastTurn < currTurn)// && currTurn % _chaseeSpawnFrequency == 0)
         {
-            if (currTurn % _chaseeSpawnFrequency == 0)
+            if (currTurn % _chaseeSpawnFrequency == 0 && _totalChasees > 0)
             {
-                int chaseeSpawned = 0;
                 int chaseeToSpawn = Random.Range(_chaseeToSpawnMin, _chaseeToSpawnMax);
-                while (chaseeSpawned++ < chaseeToSpawn)
+                chaseeToSpawn = Mathf.Clamp(chaseeToSpawn, 0, _totalChasees);
+                _totalChasees -= chaseeToSpawn;
+                while (chaseeToSpawn > 0)
                 {
                     SpawnRunner(_chaseePrefab);
+                    chaseeToSpawn--;
+                    _chaseeInPlay++;
                 }
                 _allowChaserSpawn = true;
             }
-            else if (currTurn % (_chaseeSpawnFrequency + Random.Range(1, _chaseeSpawnFrequency - 1)) == 0)
+            else if (_allowChaserSpawn && currTurn % (_chaseeSpawnFrequency + Random.Range(1, _chaseeSpawnFrequency + 1)) == 0 && _totalChasers > 0)
             {
-                int chaserSpawned = 0;
                 int chaserToSpawn = Random.Range(_chaserToSpawnMin, _chaserToSpawnMax);
-                while (chaserSpawned++ < chaserToSpawn)
+                chaserToSpawn = Mathf.Clamp(chaserToSpawn, 0, _totalChasers);
+                _totalChasers -= chaserToSpawn;
+                while (chaserToSpawn > 0)
                 {
                     SpawnRunner(_chaserPrefab);
+                    chaserToSpawn--;
                 }
                 _allowChaserSpawn = false;
                 
@@ -110,5 +123,10 @@ public class RunnerSpawner : MonoBehaviour
             runner.transform.localScale.y,
             runner.transform.localScale.z * floorTile.transform.localScale.z);
         runner.GetComponent<RunnerController>().Direction = Directions2d.eRight;
+    }
+
+    public static int Clamp(int value, int min, int max)
+    {
+        return (value < min) ? min : (value > max) ? max : value;
     }
 }

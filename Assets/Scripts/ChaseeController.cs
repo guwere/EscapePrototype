@@ -3,18 +3,24 @@ using System.Collections;
 
 public class ChaseeController : RunnerController
 {
-    
+    public static int _exitScoreInitial = 10;
+    private RunnerSpawner _runnerSpawner;
 
-    // Use this for initialization
     protected override void Start()
     {
         base.Start();
+        _exitScoreCurrent = _exitScoreInitial;
+        _runnerSpawner = GameObject.FindGameObjectWithTag("GameController").GetComponent<RunnerSpawner>();
     }
 
-    // Update is called once per frame
-    protected override void Update()
+    void OnTriggerEnter(Collider other)
     {
-        base.Update();
+        if (other.gameObject.tag == "Chaser")
+        {
+            _originalColor = _failColor;
+            _exitScoreCurrent = 0;
+            _runnerState = State.eVanishing;
+            _runnerSpawner.ChaseeInPlay = _runnerSpawner.ChaseeInPlay - 1;
+        }
     }
-
 }

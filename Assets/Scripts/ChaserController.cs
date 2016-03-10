@@ -3,16 +3,11 @@ using System.Collections;
 
 public class ChaserController : RunnerController
 {
+    public static int _exitScoreInitial = -20;
 
-    // Use this for initialization
     protected override void Start()
     {
         base.Start();
-    }
-
-    // Update is called once per frame
-    protected override void Update()
-    {
-        base.Update();
+        _exitScoreCurrent = _exitScoreInitial;
     }
 }

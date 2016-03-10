@@ -3,15 +3,15 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class RunnerController : MonoBehaviour
+public abstract class RunnerController : MonoBehaviour
 {
     public float _vanishDuration = 1f;
     private float _elapsedVanishDuration = 0f;
-    private Color _originalColor;
-    private Color _vanishColor = new Color(0, 0, 0, 0);
+    protected Color _originalColor;
+    protected Color _vanishColor = new Color(0, 0, 0, 0);
     public Color32 _successColor = new Color(128, 255, 128, 0);
     public Color32 _failColor = new Color(0, 0, 0, 0);
-    public int _exitScore = 10;
+    protected int _exitScoreCurrent = 0;
 
     public enum State
     {
@@ -22,7 +22,7 @@ public class RunnerController : MonoBehaviour
 
     private FloorGridController _floorGridPlacer;
 
-    private State _runnerState = State.eMoving;
+    protected State _runnerState = State.eMoving;
     private Directions2d _direction = Directions2d.eNone;
 
     private Vector3 _startPosition;
@@ -74,7 +74,7 @@ public class RunnerController : MonoBehaviour
 
     protected virtual void reachedExitPoint()
     {
-        GameObject.Find("ScoreText").GetComponent<ScoreText>().AddScore(_exitScore);
+        GameObject.Find("ScoreText").GetComponent<ScoreText>().AddScore(_exitScoreCurrent);
         Destroy(this.gameObject);
     }
 
