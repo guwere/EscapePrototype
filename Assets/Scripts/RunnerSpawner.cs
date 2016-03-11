@@ -7,24 +7,19 @@ using Random = UnityEngine.Random;
 public class RunnerSpawner : MonoBehaviour
 {
     private FloorGridController _floorController;
-    private FloorGridConfiguration _floorConfig;
+    private GameConfiguration _gameConfig;
     private TurnAdvancement _turn;
     public GameObject _chaseePrefab;
     public GameObject _chaserPrefab;
 
-    public int _chaseeSpawnFrequency = 5; // how many turns before the next batch of chasees are spawned
     public int _chaseeToSpawnMin = 1; // the minimum amount of chasee that will be spanwed
     public int _chaseeToSpawnMax = 2; // the maximum amount of chasee that will be spanwed
-    public int _totalChasees = 50; // total number of chasees that can spawn
     private int _chaseeInPlay;
 
     public int _chaserToSpawnMin = 1;
     public int _chaserToSpawnMax = 2;
-    public int _totalChasers = 10;
-
-
+ 
     private bool _allowChaserSpawn = false;
-
 
 
     private int _lastTurn = -1;
@@ -39,7 +34,7 @@ public class RunnerSpawner : MonoBehaviour
     void Start()
     {
         _floorController = (FloorGridController)GameObject.FindObjectOfType(typeof(FloorGridController));
-        _floorConfig = (FloorGridConfiguration)GameObject.FindObjectOfType(typeof(FloorGridConfiguration));
+        _gameConfig = (GameConfiguration)GameObject.FindObjectOfType(typeof(GameConfiguration));
         _turn = GetComponent<TurnAdvancement>();
 
         //spawnRunnerTest();
@@ -50,11 +45,11 @@ public class RunnerSpawner : MonoBehaviour
         int currTurn = _turn.TurnsElapsed;
         if (_lastTurn < currTurn)// && currTurn % _chaseeSpawnFrequency == 0)
         {
-            if (currTurn % _chaseeSpawnFrequency == 0 && _totalChasees > 0)
+            if (currTurn % _gameConfig._chaseeSpawnFrequency == 0 && _gameConfig._totalChasees > 0)
             {
                 int chaseeToSpawn = Random.Range(_chaseeToSpawnMin, _chaseeToSpawnMax);
-                chaseeToSpawn = Mathf.Clamp(chaseeToSpawn, 0, _totalChasees);
-                _totalChasees -= chaseeToSpawn;
+                chaseeToSpawn = Mathf.Clamp(chaseeToSpawn, 0, _gameConfig._totalChasees);
+                _gameConfig._totalChasees -= chaseeToSpawn;
                 while (chaseeToSpawn > 0)
                 {
                     SpawnRunner(_chaseePrefab);
@@ -63,11 +58,11 @@ public class RunnerSpawner : MonoBehaviour
                 }
                 _allowChaserSpawn = true;
             }
-            else if (_allowChaserSpawn && currTurn % (_chaseeSpawnFrequency + Random.Range(1, _chaseeSpawnFrequency + 1)) == 0 && _totalChasers > 0)
+            else if (_allowChaserSpawn && currTurn % (_gameConfig._chaseeSpawnFrequency + Random.Range(1, _gameConfig._chaseeSpawnFrequency + 1)) == 0 && _gameConfig._totalChasers > 0)
             {
                 int chaserToSpawn = Random.Range(_chaserToSpawnMin, _chaserToSpawnMax);
-                chaserToSpawn = Mathf.Clamp(chaserToSpawn, 0, _totalChasers);
-                _totalChasers -= chaserToSpawn;
+                chaserToSpawn = Mathf.Clamp(chaserToSpawn, 0, _gameConfig._totalChasers);
+                _gameConfig._totalChasers -= chaserToSpawn;
                 while (chaserToSpawn > 0)
                 {
                     SpawnRunner(_chaserPrefab);
@@ -114,8 +109,8 @@ public class RunnerSpawner : MonoBehaviour
     private void SpawnRunnerTest()
     {
         GridMovement randomMovement = new GridMovement();
-        randomMovement._position._row = Random.Range(0, _floorConfig._rows - 1);
-        randomMovement._position._col = Random.Range(0, _floorConfig._columns - 1);
+        randomMovement._position._row = Random.Range(0, _gameConfig._rows - 1);
+        randomMovement._position._col = Random.Range(0, _gameConfig._columns - 1);
         randomMovement._direction = Directions2d.eRight;
 
         GameObject floorTile = _floorController.GetFloorTile(randomMovement._position);

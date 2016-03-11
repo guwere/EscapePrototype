@@ -20,7 +20,7 @@ public abstract class RunnerController : MonoBehaviour
         eDestroy
     }
 
-    private FloorGridConfiguration _floorConfig;
+    private GameConfiguration _gameConfig;
     private FloorGridController _floorController;
 
     protected State _runnerState = State.eMoving;
@@ -45,7 +45,7 @@ public abstract class RunnerController : MonoBehaviour
     protected virtual void Start()
     {
         _originalColor = GetComponent<Renderer>().material.color;
-        _floorConfig = (FloorGridConfiguration) GameObject.FindObjectOfType(typeof (FloorGridConfiguration));
+        _gameConfig = (GameConfiguration) GameObject.FindObjectOfType(typeof (GameConfiguration));
         _floorController = (FloorGridController) GameObject.FindObjectOfType(typeof (FloorGridController));
         _originalRotation = transform.localEulerAngles;
     }
@@ -163,13 +163,13 @@ public abstract class RunnerController : MonoBehaviour
                 break;
             case Directions2d.eUp:
             {
-                if (result._position._row < _floorConfig._rows - 1)
+                if (result._position._row < _gameConfig._rows - 1)
                 {
                     result._position._row++;
                 }
                 else
                 {
-                    if (result._position._col < _floorConfig._columns - 1)
+                    if (result._position._col < _gameConfig._columns - 1)
                     {
                         result._position._col++;
                         result._direction = Directions2d.eRight;
@@ -212,7 +212,7 @@ public abstract class RunnerController : MonoBehaviour
                 }
                 else
                 {
-                    if (result._position._row < _floorConfig._rows - 1)
+                    if (result._position._row < _gameConfig._rows - 1)
                     {
                         result._position._row++;
                         result._direction = Directions2d.eUp;
@@ -227,7 +227,7 @@ public abstract class RunnerController : MonoBehaviour
                 break;
             case Directions2d.eRight:
             {
-                if (result._position._col < _floorConfig._columns - 1)
+                if (result._position._col < _gameConfig._columns - 1)
                 {
                     result._position._col++;
                 }

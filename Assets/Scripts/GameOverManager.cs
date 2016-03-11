@@ -10,35 +10,31 @@ public class GameOverManager : MonoBehaviour
 
     public float _restartDelay = 2f;
 
-
-    public int _mouseScore;
-    public int _catScore;
-    public int _targetScore;
-
     private float _restartTimer;
     private RunnerSpawner _runnerSpawner;
     private Animator _anim;
+    private GameConfiguration _gameConfig;
 
     private void Awake()
     {
-        // Set up the reference.
+        _gameConfig = (GameConfiguration) FindObjectOfType(typeof (GameConfiguration));
         _anim = GameObject.FindGameObjectWithTag("HUDCanvas").GetComponent<Animator>();
         _runnerSpawner = GameObject.FindGameObjectWithTag("GameController").GetComponent<RunnerSpawner>();
-        _targetScoreText._score = _targetScore;
+        _targetScoreText._score = _gameConfig._targetScore;
     }
 
 
     private void Update()
     {
 
-        if (_currentScoreText._score >= _targetScore)
+        if (_currentScoreText._score >= _gameConfig._targetScore)
         {
             GameObject.Find("GameOverText").GetComponent<Text>().text = "You Win!";
             TransitionToGameOver();
         }
         else if (_currentScoreText._score +
-                 _mouseScore * (_runnerSpawner._totalChasees + _runnerSpawner.ChaseeInPlay) <
-                 _targetScore)
+                 _gameConfig._mouseScore * (_gameConfig._totalChasees + _runnerSpawner.ChaseeInPlay) <
+                 _gameConfig._targetScore)
         {
             GameObject.Find("GameOverText").GetComponent<Text>().text = "You Lose!";
 

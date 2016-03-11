@@ -8,7 +8,7 @@ public class ChaseeController : RunnerController
     protected override void Start()
     {
         base.Start();
-        _exitScoreCurrent = ((GameOverManager)FindObjectOfType(typeof(GameOverManager)))._mouseScore;
+        _exitScoreCurrent = ((GameConfiguration)FindObjectOfType(typeof(GameConfiguration)))._mouseScore;
         _runnerSpawner = GameObject.FindGameObjectWithTag("GameController").GetComponent<RunnerSpawner>();
     }
 

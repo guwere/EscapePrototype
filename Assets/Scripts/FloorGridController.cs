@@ -9,7 +9,7 @@ public class FloorGridController : MonoBehaviour
 {
 
 
-    private FloorGridConfiguration _floorConfig;
+    private GameConfiguration _gameConfig;
 
     [Range(0.0f, 1.0f)]
     public float _tileSpacing = 0.1f; // percent fo the size of the tile
@@ -49,9 +49,9 @@ public class FloorGridController : MonoBehaviour
     void Start()
     {
 
-        _floorConfig = (FloorGridConfiguration) GameObject.FindObjectOfType(typeof (FloorGridConfiguration));
+        _gameConfig = (GameConfiguration) GameObject.FindObjectOfType(typeof (GameConfiguration));
         _floorSize = GetComponent<Renderer>().bounds.size;
-        _tileScaleFactorVector = new Vector3((_floorSize.z / _floorConfig._columns), 1f, (_floorSize.x / _floorConfig._rows));
+        _tileScaleFactorVector = new Vector3((_floorSize.z / _gameConfig._columns), 1f, (_floorSize.x / _gameConfig._rows));
 
         int numWalls = Enum.GetNames(typeof(WallSide)).Length;
         _exitPoints = new ArrayList[numWalls];
@@ -60,10 +60,10 @@ public class FloorGridController : MonoBehaviour
             _exitPoints[wall] = new ArrayList();
         }
 
-        _floorTiles = new GameObject[_floorConfig._columns][];
-        for (int col = 0; col < _floorConfig._columns; col++)
+        _floorTiles = new GameObject[_gameConfig._columns][];
+        for (int col = 0; col < _gameConfig._columns; col++)
         {
-            _floorTiles[col] = new GameObject[_floorConfig._rows];
+            _floorTiles[col] = new GameObject[_gameConfig._rows];
         }
 
         CreateGroundTiles();
@@ -74,15 +74,15 @@ public class FloorGridController : MonoBehaviour
     {
         // Change the size of the tile
         _groundTileScale = _groundTile.transform.localScale;
-        _groundTileScale.z = (_floorSize.z / _floorConfig._columns) * (1.0f - _tileSpacing);
-        _groundTileScale.x = _floorSize.x / _floorConfig._rows * (1.0f - _tileSpacing);
+        _groundTileScale.z = (_floorSize.z / _gameConfig._columns) * (1.0f - _tileSpacing);
+        _groundTileScale.x = _floorSize.x / _gameConfig._rows * (1.0f - _tileSpacing);
         // Get the tile size
         Vector3 anchorOffset = new Vector3(-_tileScaleFactorVector.z / 2, 0, _tileScaleFactorVector.x / 2);
 
 
-        for (int row = 0; row < _floorConfig._rows; row++)
+        for (int row = 0; row < _gameConfig._rows; row++)
         {
-            for (int col = 0; col < _floorConfig._columns; col++)
+            for (int col = 0; col < _gameConfig._columns; col++)
             {
                 GameObject groundTile = Instantiate(_groundTile, new Vector3(0, 0), Quaternion.identity) as GameObject;
                 // Change the parent
@@ -103,7 +103,7 @@ public class FloorGridController : MonoBehaviour
         float mouseHoleYOffset = _mouseHole.GetComponent<Renderer>().bounds.size.y / 2;
         //Random.seed = 101;
 
-        for (int i = 0; i < _floorConfig._numHoles; i++)
+        for (int i = 0; i < _gameConfig._numHoles; i++)
         {
             bool positionChosen = false;
             int randomPosition = 0;
@@ -114,7 +114,7 @@ public class FloorGridController : MonoBehaviour
                 // Change where the mouse hole is positioned along the wall
                 ArrayList wallOccupancy = _exitPoints[randomWall];
                 horizontal = (WallSide)randomWall == WallSide.eBack;
-                randomPosition = Random.Range(0, (horizontal ? _floorConfig._columns : _floorConfig._rows));
+                randomPosition = Random.Range(0, (horizontal ? _gameConfig._columns : _gameConfig._rows));
                 Debug.Log("Random position(" + ((WallSide)randomWall).ToString() + "," + randomPosition + ")");
                 if (!(wallOccupancy.Contains(randomPosition)))
                 {
@@ -196,10 +196,10 @@ public class FloorGridController : MonoBehaviour
                 break;
             case WallSide.eRight:
                 result._row = position;
-                result._col = _floorConfig._columns - 1;
+                result._col = _gameConfig._columns - 1;
                 break;
             case WallSide.eBack:
-                result._row = _floorConfig._rows - 1;
+                result._row = _gameConfig._rows - 1;
                 result._col = position;
                 break;
             default:
