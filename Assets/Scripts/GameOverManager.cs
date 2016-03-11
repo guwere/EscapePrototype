@@ -5,33 +5,40 @@ using UnityEngine.UI;
 public class GameOverManager : MonoBehaviour
 {
 
-    public ScoreText _currentScore;
-    public ScoreText _targetScore;
+    public ScoreText _currentScoreText;
+    public ScoreText _targetScoreText;
 
-    private Animator _anim;
-    private float _restartTimer;
     public float _restartDelay = 2f;
+
+
+    public int _mouseScore;
+    public int _catScore;
+    public int _targetScore;
+
+    private float _restartTimer;
     private RunnerSpawner _runnerSpawner;
+    private Animator _anim;
 
     private void Awake()
     {
         // Set up the reference.
-        _anim = GetComponent<Animator>();
+        _anim = GameObject.FindGameObjectWithTag("HUDCanvas").GetComponent<Animator>();
         _runnerSpawner = GameObject.FindGameObjectWithTag("GameController").GetComponent<RunnerSpawner>();
+        _targetScoreText._score = _targetScore;
     }
 
 
     private void Update()
     {
 
-        if (_currentScore._score >= _targetScore._score)
+        if (_currentScoreText._score >= _targetScore)
         {
             GameObject.Find("GameOverText").GetComponent<Text>().text = "You Win!";
             TransitionToGameOver();
         }
-        else if (_currentScore._score +
-                 ChaseeController._exitScoreInitial * (_runnerSpawner._totalChasees + _runnerSpawner.ChaseeInPlay) <
-                 _targetScore._score)
+        else if (_currentScoreText._score +
+                 _mouseScore * (_runnerSpawner._totalChasees + _runnerSpawner.ChaseeInPlay) <
+                 _targetScore)
         {
             GameObject.Find("GameOverText").GetComponent<Text>().text = "You Lose!";
 
@@ -51,8 +58,7 @@ public class GameOverManager : MonoBehaviour
         // .. if it reaches the restart delay...
         if (_restartTimer >= _restartDelay)
         {
-            // .. then reload the currently loaded level.
-            SceneManager.LoadScene("GameScene");
+            SceneManager.LoadScene("MenuScene");
         }
     }
 }

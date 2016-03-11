@@ -3,13 +3,12 @@ using System.Collections;
 
 public class ChaseeController : RunnerController
 {
-    public static int _exitScoreInitial = 10;
     private RunnerSpawner _runnerSpawner;
 
     protected override void Start()
     {
         base.Start();
-        _exitScoreCurrent = _exitScoreInitial;
+        _exitScoreCurrent = ((GameOverManager)FindObjectOfType(typeof(GameOverManager)))._mouseScore;
         _runnerSpawner = GameObject.FindGameObjectWithTag("GameController").GetComponent<RunnerSpawner>();
     }
 
