@@ -28,6 +28,8 @@ public abstract class RunnerController : MonoBehaviour
     private Vector3 _startPosition;
     private Vector3 _nextPosition;
 
+    private Vector3 _originalRotation;
+
     public Directions2d Direction
     {
         get { return _direction; }
@@ -43,6 +45,7 @@ public abstract class RunnerController : MonoBehaviour
     {
         _originalColor = GetComponent<Renderer>().material.color;
         _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
+        _originalRotation = transform.localEulerAngles;
     }
 
     protected virtual void Update()
@@ -85,8 +88,35 @@ public abstract class RunnerController : MonoBehaviour
         GridMovement nextMove = GetNextGridMovementDefault(currGridPos._row, currGridPos._col);
         GameObject nextTile = _floorGridPlacer.GetFloorTile(nextMove._position);
         _nextPosition = nextTile.transform.position;
+        _direction = nextMove._direction;
         _nextPosition.y = transform.position.y;
         _startPosition = transform.position;
+
+        ChangeModelRotation(nextMove._direction);
+    }
+
+    private void ChangeModelRotation(Directions2d direction)
+    {
+        Vector3 newRotation = _originalRotation;
+        switch (direction)
+        {
+            case Directions2d.eUp:
+                newRotation.y -= 90f;
+                break;
+            case Directions2d.eDown:
+                newRotation.y += 90f;
+                break;
+            case Directions2d.eLeft:
+                newRotation.y += 180f;
+                break;
+            case Directions2d.eRight:
+                newRotation.y -= 0;
+                break;
+            case Directions2d.eNone:
+            default:
+                throw new ArgumentOutOfRangeException("direction", direction, null);
+        }
+        transform.localEulerAngles = newRotation;
     }
 
     public void Move(float f)
@@ -140,12 +170,12 @@ public abstract class RunnerController : MonoBehaviour
                     if (result._position._col < _floorGridPlacer._columns - 1)
                     {
                         result._position._col++;
-                        _direction = Directions2d.eRight;
+                        result._direction = Directions2d.eRight;
                     }
                     else
                     {
                         result._position._row--;
-                        _direction = Directions2d.eDown;
+                        result._direction = Directions2d.eDown;
                     }
                 }
             }
@@ -161,12 +191,12 @@ public abstract class RunnerController : MonoBehaviour
                     if (result._position._col > 0)
                     {
                         result._position._col--;
-                        _direction = Directions2d.eLeft;
+                        result._direction = Directions2d.eLeft;
                     }
                     else
                     {
                         result._position._row++;
-                        _direction = Directions2d.eUp;
+                        result._direction = Directions2d.eUp;
                     }
                 }
             }
@@ -183,12 +213,12 @@ public abstract class RunnerController : MonoBehaviour
                     if (result._position._row < _floorGridPlacer._rows - 1)
                     {
                         result._position._row++;
-                        _direction = Directions2d.eUp;
+                        result._direction = Directions2d.eUp;
                     }
                     else
                     {
                         result._position._col++;
-                        _direction = Directions2d.eRight;
+                        result._direction = Directions2d.eRight;
                     }
                 }
             }
@@ -204,12 +234,12 @@ public abstract class RunnerController : MonoBehaviour
                     if (result._position._row > 0)
                     {
                         result._position._row--;
-                        _direction = Directions2d.eDown;
+                        result._direction = Directions2d.eDown;
                     }
                     else
                     {
                         result._position._col--;
-                        _direction = Directions2d.eLeft;
+                        result._direction = Directions2d.eLeft;
                     }
                 }
             }

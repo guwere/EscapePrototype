@@ -20,7 +20,12 @@ public class ChaseeController : RunnerController
             _originalColor = _failColor;
             _exitScoreCurrent = 0;
             _runnerState = State.eVanishing;
-            _runnerSpawner.ChaseeInPlay = _runnerSpawner.ChaseeInPlay - 1;
         }
+    }
+
+    protected override void reachedExitPoint()
+    {
+        base.reachedExitPoint();
+        _runnerSpawner.ChaseeInPlay = _runnerSpawner.ChaseeInPlay - 1;
     }
 }
