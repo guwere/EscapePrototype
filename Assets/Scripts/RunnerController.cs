@@ -20,7 +20,8 @@ public abstract class RunnerController : MonoBehaviour
         eDestroy
     }
 
-    private FloorGridController _floorGridPlacer;
+    private FloorGridConfiguration _floorConfig;
+    private FloorGridController _floorController;
 
     protected State _runnerState = State.eMoving;
     private Directions2d _direction = Directions2d.eNone;
@@ -44,7 +45,8 @@ public abstract class RunnerController : MonoBehaviour
     protected virtual void Start()
     {
         _originalColor = GetComponent<Renderer>().material.color;
-        _floorGridPlacer = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
+        _floorConfig = (FloorGridConfiguration) GameObject.FindObjectOfType(typeof (FloorGridConfiguration));
+        _floorController = (FloorGridController) GameObject.FindObjectOfType(typeof (FloorGridController));
         _originalRotation = transform.localEulerAngles;
     }
 
@@ -84,9 +86,9 @@ public abstract class RunnerController : MonoBehaviour
     public void CalculateNextPosition()
     {
         GameObject currTile = GetTileBelow();
-        GridPosition currGridPos = _floorGridPlacer.GetGridPosition(currTile);
+        GridPosition currGridPos = _floorController.GetGridPosition(currTile);
         GridMovement nextMove = GetNextGridMovementDefault(currGridPos._row, currGridPos._col);
-        GameObject nextTile = _floorGridPlacer.GetFloorTile(nextMove._position);
+        GameObject nextTile = _floorController.GetFloorTile(nextMove._position);
         _nextPosition = nextTile.transform.position;
         _direction = nextMove._direction;
         _nextPosition.y = transform.position.y;
@@ -161,13 +163,13 @@ public abstract class RunnerController : MonoBehaviour
                 break;
             case Directions2d.eUp:
             {
-                if (result._position._row < _floorGridPlacer._rows - 1)
+                if (result._position._row < _floorConfig._rows - 1)
                 {
                     result._position._row++;
                 }
                 else
                 {
-                    if (result._position._col < _floorGridPlacer._columns - 1)
+                    if (result._position._col < _floorConfig._columns - 1)
                     {
                         result._position._col++;
                         result._direction = Directions2d.eRight;
@@ -210,7 +212,7 @@ public abstract class RunnerController : MonoBehaviour
                 }
                 else
                 {
-                    if (result._position._row < _floorGridPlacer._rows - 1)
+                    if (result._position._row < _floorConfig._rows - 1)
                     {
                         result._position._row++;
                         result._direction = Directions2d.eUp;
@@ -225,7 +227,7 @@ public abstract class RunnerController : MonoBehaviour
                 break;
             case Directions2d.eRight:
             {
-                if (result._position._col < _floorGridPlacer._columns - 1)
+                if (result._position._col < _floorConfig._columns - 1)
                 {
                     result._position._col++;
                 }

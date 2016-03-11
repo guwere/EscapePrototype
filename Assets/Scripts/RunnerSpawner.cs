@@ -6,7 +6,8 @@ using Random = UnityEngine.Random;
 
 public class RunnerSpawner : MonoBehaviour
 {
-    private FloorGridController _floor;
+    private FloorGridController _floorController;
+    private FloorGridConfiguration _floorConfig;
     private TurnAdvancement _turn;
     public GameObject _chaseePrefab;
     public GameObject _chaserPrefab;
@@ -37,7 +38,8 @@ public class RunnerSpawner : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-        _floor = GameObject.FindGameObjectWithTag("Floor").GetComponent<FloorGridController>();
+        _floorController = (FloorGridController)GameObject.FindObjectOfType(typeof(FloorGridController));
+        _floorConfig = (FloorGridConfiguration)GameObject.FindObjectOfType(typeof(FloorGridConfiguration));
         _turn = GetComponent<TurnAdvancement>();
 
         //spawnRunnerTest();
@@ -83,7 +85,7 @@ public class RunnerSpawner : MonoBehaviour
     {
         GridMovement randomMovement = GetRandomGridMovement();
 
-        GameObject floorTile = _floor.GetFloorTile(randomMovement._position);
+        GameObject floorTile = _floorController.GetFloorTile(randomMovement._position);
         GameObject runner = Instantiate(prefab);
         runner.transform.localPosition = floorTile.transform.position + new Vector3(0, 0.2f, 0);
         runner.transform.localScale = new Vector3(runner.transform.localScale.x * floorTile.transform.localScale.x,
@@ -100,11 +102,11 @@ public class RunnerSpawner : MonoBehaviour
         {
             randomWall = Random.Range(0, Enum.GetNames(typeof(WallSide)).Length);
         }
-        while (_floor.ExitPoints[randomWall].Count <= 0);
+        while (_floorController.ExitPoints[randomWall].Count <= 0);
 
-        int randomPosition = (int)_floor.ExitPoints[randomWall][Random.Range(0, _floor.ExitPoints[randomWall].Count)];
-        randomMovement._position = _floor.GetMouseHoleGridPosition((WallSide)randomWall, randomPosition);
-        randomMovement._direction = _floor.GetExitPointDirection((WallSide)randomWall);
+        int randomPosition = (int)_floorController.ExitPoints[randomWall][Random.Range(0, _floorController.ExitPoints[randomWall].Count)];
+        randomMovement._position = _floorController.GetMouseHoleGridPosition((WallSide)randomWall, randomPosition);
+        randomMovement._direction = _floorController.GetExitPointDirection((WallSide)randomWall);
 
         return randomMovement;
     }
@@ -112,11 +114,11 @@ public class RunnerSpawner : MonoBehaviour
     private void SpawnRunnerTest()
     {
         GridMovement randomMovement = new GridMovement();
-        randomMovement._position._row = Random.Range(0, _floor._rows - 1);
-        randomMovement._position._col = Random.Range(0, _floor._columns - 1);
+        randomMovement._position._row = Random.Range(0, _floorConfig._rows - 1);
+        randomMovement._position._col = Random.Range(0, _floorConfig._columns - 1);
         randomMovement._direction = Directions2d.eRight;
 
-        GameObject floorTile = _floor.GetFloorTile(randomMovement._position);
+        GameObject floorTile = _floorController.GetFloorTile(randomMovement._position);
         GameObject runner = Instantiate(_chaseePrefab);
         runner.transform.localPosition = floorTile.transform.position + new Vector3(0, 0.2f, 0);
         runner.transform.localScale = new Vector3(runner.transform.localScale.x * floorTile.transform.localScale.x,
